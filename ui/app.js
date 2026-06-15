@@ -1725,7 +1725,13 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   // Approval buttons
-  document.getElementById("approve-all-btn").addEventListener("click", () => submitDecision(true, false));
+  document.getElementById("approve-all-btn").addEventListener("click", () => {
+    document.querySelectorAll(".action-item").forEach(item => {
+      item.dataset.approved = "true";
+      item.className = "action-item approved";
+      item.querySelectorAll(".action-btn").forEach(b => b.classList.toggle("active", b.dataset.approved === "true"));
+    });
+  });
   document.getElementById("reject-all-btn").addEventListener("click",  () => submitDecision(false, true));
   document.getElementById("submit-btn").addEventListener("click",      () => submitDecision(false, false));
 
