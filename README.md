@@ -27,8 +27,8 @@ Every ATT&CK technique is grounded in retrieval from Azure AI Search across thre
 No Azure credentials needed. Runs entirely from a pre-built scenario.
 
 ```bash
-git clone https://github.com/deen-02/topsec-agent-demo
-cd topsec-agent-demo
+git clone https://github.com/deen-02/TopSec-MS
+cd TopSec-MS
 ```
 
 **Windows**
