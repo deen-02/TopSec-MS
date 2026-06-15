@@ -1317,13 +1317,13 @@ function _positionDemoRing(ring, label, el, pad = 5) {
 function _isElVisible(el) {
   const r = el.getBoundingClientRect();
   if (r.width <= 0 || r.height <= 0 || r.top >= window.innerHeight || r.bottom <= 0) return false;
-  // Also check against nearest scrollable ancestor so ring hides when card scrolls out of its container
   let p = el.parentElement;
   while (p && p !== document.body) {
     const ov = getComputedStyle(p).overflowY;
     if (ov === "auto" || ov === "scroll") {
       const pr = p.getBoundingClientRect();
-      if (r.bottom <= pr.top || r.top >= pr.bottom) return false;
+      const midY = (r.top + r.bottom) / 2;
+      if (midY < pr.top || midY > pr.bottom) return false;
       break;
     }
     p = p.parentElement;
