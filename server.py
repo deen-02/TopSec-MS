@@ -218,7 +218,7 @@ async def demo_trigger(scenario: str = "credential_stuffing"):
         # Build mitre_mappings dropping extra fields not in the model
         mitre_raw = inv.get("mitre_mappings", [])
         mitre_clean = [
-            {k: v for k, v in m.items() if k in {"technique_id", "technique_name", "tactic", "confidence", "description"}}
+            {k: v for k, v in m.items() if k in {"technique_id", "technique_name", "tactic", "confidence", "description", "evidence"}}
             for m in mitre_raw
         ]
         r = IncidentReport(

@@ -818,18 +818,9 @@ async function animateFoundryIQ(r) {
     await new Promise(res => setTimeout(res, 120));
   }
 
-  // Then show individual MITRE hits
-  for (const t of techs) {
-    await new Promise(res => setTimeout(res, 180 + Math.random()*120));
-    const el = document.createElement("div");
-    el.className = "iq-step iq-step-found";
-    el.innerHTML = `<span class="iq-tick">✓</span><span class="iq-tid">${escHtml(t.technique_id)}</span><span class="iq-tname">${escHtml(t.technique_name)}</span><span class="iq-ttactic">${escHtml(t.tactic)}</span>`;
-    steps.appendChild(el);
-    demoOnIQResult(t);
-  }
-
-  const total = sources.length + techs.length;
+  const total = sources.length;
   if (status) { status.textContent = `${total} results across 3 indexes`; status.className = "iq-live-status done"; }
+  techs.forEach(t => demoOnIQResult(t));
 }
 
 // ── Submit decision ────────────────────────────────────────────────────────────

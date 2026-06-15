@@ -22,6 +22,7 @@ class MitreMapping(BaseModel):
     tactic: str = ""
     confidence: float = 0.0
     description: str = ""
+    evidence: str = ""
 
 
 class IncidentReport(BaseModel):
