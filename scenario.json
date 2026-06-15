@@ -1,0 +1,193 @@
+{
+  "incident": {
+    "incident_id": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg-soc/providers/Microsoft.OperationalInsights/workspaces/law-soc/providers/Microsoft.SecurityInsights/incidents/demo-001",
+    "incident_number": 1042,
+    "title": "Credential Stuffing Attack  -  Token Theft  -  Lateral Movement via WMI",
+    "severity": "High",
+    "status": "New",
+    "created_time": "2026-06-09T10:10:00Z",
+    "last_modified_time": "2026-06-09T10:24:00Z",
+    "description": "Multiple failed logins from two Tor/VPN exit nodes preceded successful authentication for john.doe@contoso.com. An OAuth access token was immediately requested and used to enumerate mailbox contents. Defender telemetry shows subsequent WMI remote execution from the compromised workstation to two additional hosts.",
+    "entities": [
+      { "entity_type": "IP",      "value": "185.220.101.45",        "friendly_name": "185.220.101.45",        "additional_data": {} },
+      { "entity_type": "IP",      "value": "91.108.4.200",           "friendly_name": "91.108.4.200",           "additional_data": {} },
+      { "entity_type": "Account", "value": "john.doe@contoso.com",   "friendly_name": "John Doe",               "additional_data": { "upn": "john.doe@contoso.com", "aadUserId": "usr-jd-001" } },
+      { "entity_type": "Host",    "value": "DESKTOP-JD-001",         "friendly_name": "DESKTOP-JD-001",         "additional_data": { "dnsDomain": "contoso.com" } },
+      { "entity_type": "Host",    "value": "WORKSTATION-B",          "friendly_name": "WORKSTATION-B",          "additional_data": { "dnsDomain": "contoso.com" } },
+      { "entity_type": "Host",    "value": "WORKSTATION-C",          "friendly_name": "WORKSTATION-C",          "additional_data": { "dnsDomain": "contoso.com" } }
+    ],
+    "alert_ids": ["alert-001", "alert-002", "alert-003", "alert-004"],
+    "alert_names": [
+      "Credential Stuffing  -  High Volume Failed Logins",
+      "Successful Sign-in After Brute Force",
+      "Anomalous OAuth Token Acquisition",
+      "Lateral Movement via WMI Detected"
+    ],
+    "tactics": ["CredentialAccess", "InitialAccess", "LateralMovement"],
+    "raw_events": [
+      {
+        "table": "SigninLogs",
+        "timestamp": "2026-06-09T10:10:03Z",
+        "data": { "UserPrincipalName": "john.doe@contoso.com", "IPAddress": "185.220.101.45", "ResultType": "50126", "ResultDescription": "Invalid username or password", "AppDisplayName": "Office 365", "Location": "NL" }
+      },
+      {
+        "table": "SigninLogs",
+        "timestamp": "2026-06-09T10:12:33Z",
+        "data": { "UserPrincipalName": "john.doe@contoso.com", "IPAddress": "185.220.101.45", "ResultType": "0", "ResultDescription": "Success", "AppDisplayName": "Office 365", "Location": "NL", "AuthenticationRequirement": "singleFactorAuthentication" }
+      },
+      {
+        "table": "AuditLogs",
+        "timestamp": "2026-06-09T10:13:01Z",
+        "data": { "ActivityDisplayName": "Add delegated permission grant", "InitiatedBy": "john.doe@contoso.com", "TargetResources": "Microsoft Graph", "Result": "success" }
+      },
+      {
+        "table": "DeviceEvents",
+        "timestamp": "2026-06-09T10:18:44Z",
+        "data": { "DeviceName": "DESKTOP-JD-001", "ActionType": "WmiActivity", "InitiatingProcessCommandLine": "wmic /node:WORKSTATION-B process call create 'powershell -enc JAB...'", "AccountName": "john.doe" }
+      },
+      {
+        "table": "DeviceEvents",
+        "timestamp": "2026-06-09T10:19:12Z",
+        "data": { "DeviceName": "WORKSTATION-B", "ActionType": "WmiActivity", "InitiatingProcessCommandLine": "wmic /node:WORKSTATION-C process call create 'powershell -enc JAB...'", "AccountName": "john.doe" }
+      }
+    ]
+  },
+  "enrichments": {
+    "185.220.101.45": {
+      "virustotal": { "malicious": 14, "suspicious": 3, "harmless": 52, "total": 83, "country": "NL", "asn": 4224, "as_owner": "Tor Project", "reputation": -35, "tags": ["tor", "vpn"] },
+      "abuseipdb":  { "abuse_confidence": 92, "total_reports": 187, "country_code": "NL", "isp": "Zwiebel Hosting", "usage_type": "Tor Exit Node", "is_tor": true, "domain": "torproject.org", "last_reported": "2026-06-09T09:50:00Z" }
+    },
+    "91.108.4.200": {
+      "virustotal": { "malicious": 8, "suspicious": 2, "harmless": 41, "total": 70, "country": "RU", "asn": 59930, "as_owner": "QuadraNet Enterprises", "reputation": -20, "tags": ["vpn"] },
+      "abuseipdb":  { "abuse_confidence": 67, "total_reports": 44, "country_code": "RU", "isp": "VDSina", "usage_type": "Data Center/Web Hosting/Transit", "is_tor": false, "domain": "vdsina.ru", "last_reported": "2026-06-08T14:22:00Z" }
+    },
+    "john.doe@contoso.com": {
+      "user_id": "usr-jd-001",
+      "display_name": "John Doe",
+      "risk_level": "high",
+      "risk_state": "atRisk",
+      "risk_detail": "none",
+      "account_enabled": true,
+      "mfa_registered": false,
+      "failed_sign_ins_24h": 847,
+      "countries_last_7d": ["US", "NL"],
+      "recent_sign_ins": [
+        { "time": "2026-06-09T10:12:33Z", "ip": "185.220.101.45", "location": "Amsterdam, NL", "app": "Office 365", "status": "0", "device_os": "Windows 10", "is_mfa": false },
+        { "time": "2026-06-09T08:05:12Z", "ip": "192.168.1.100",  "location": "Chicago, US",   "app": "Office 365", "status": "0", "device_os": "Windows 10", "is_mfa": true  }
+      ]
+    },
+    "DESKTOP-JD-001": {
+      "device_id": "dev-jd-001-aaaa",
+      "hostname": "DESKTOP-JD-001",
+      "os_platform": "Windows10",
+      "os_version": "10.0.19045",
+      "compliance_state": "compliant",
+      "is_managed": true,
+      "risk_score": "high",
+      "last_seen": "2026-06-09T10:22:00Z",
+      "aad_joined": true
+    },
+    "WORKSTATION-B": {
+      "device_id": "dev-wb-0002-bbbb",
+      "hostname": "WORKSTATION-B",
+      "os_platform": "Windows10",
+      "os_version": "10.0.19041",
+      "compliance_state": "noncompliant",
+      "is_managed": false,
+      "risk_score": "medium",
+      "last_seen": "2026-06-09T10:21:00Z",
+      "aad_joined": false
+    },
+    "WORKSTATION-C": {
+      "device_id": "dev-wc-0003-cccc",
+      "hostname": "WORKSTATION-C",
+      "os_platform": "Windows10",
+      "os_version": "10.0.19041",
+      "compliance_state": "noncompliant",
+      "is_managed": false,
+      "risk_score": "medium",
+      "last_seen": "2026-06-09T10:23:00Z",
+      "aad_joined": false
+    }
+  },
+  "investigation": {
+    "classification": "TruePositive",
+    "confidence": 0.94,
+    "summary": "Confirmed credential stuffing attack from dual Tor/VPN infrastructure targeting john.doe@contoso.com. Successful authentication without MFA was immediately followed by OAuth token acquisition and mailbox enumeration. The compromised workstation then performed WMI-based lateral movement to two unmanaged machines (WORKSTATION-B, WORKSTATION-C), suggesting a precursor to ransomware deployment or data exfiltration staging.",
+    "attack_timeline": [
+      "10:10:03Z  -  847 failed login attempts begin from Tor exit node 185.220.101.45 (NL) against john.doe@contoso.com",
+      "10:11:14Z  -  Secondary credential stuffing from VPN IP 91.108.4.200 (RU) observed in parallel",
+      "10:12:33Z  -  Successful authentication for john.doe@contoso.com from 185.220.101.45  -  no MFA challenge issued (user not registered for MFA)",
+      "10:13:01Z  -  Attacker immediately requests OAuth delegated permissions grant for Microsoft Graph  -  token issued",
+      "10:13:45Z  -  Graph API calls observed: MailFolders.Read, Files.Read.All  -  mailbox and OneDrive enumeration",
+      "10:18:44Z  -  WMI remote process creation from DESKTOP-JD-001 to WORKSTATION-B: encoded PowerShell payload executed",
+      "10:19:12Z  -  WORKSTATION-B performs WMI remote process creation to WORKSTATION-C: lateral spread confirmed",
+      "10:24:00Z  -  Sentinel detects lateral movement pattern; incident created at severity High"
+    ],
+    "mitre_mappings": [
+      { "technique_id": "T1110.004", "technique_name": "Brute Force: Credential Stuffing", "tactic": "Credential Access", "sub_technique_id": "", "evidence": "847 failed logins from known Tor exit node followed by success  -  no MFA barrier" },
+      { "technique_id": "T1528",     "technique_name": "Steal Application Access Token",   "tactic": "Credential Access",  "sub_technique_id": "", "evidence": "OAuth delegated permission grant added immediately after successful login; Graph token used for MailFolders.Read" },
+      { "technique_id": "T1550.001", "technique_name": "Use Alternate Authentication Material: Application Access Token", "tactic": "Defense Evasion / Lateral Movement", "sub_technique_id": "", "evidence": "OAuth token used to access Microsoft Graph API resources bypassing re-authentication" },
+      { "technique_id": "T1021.006", "technique_name": "Remote Services: Windows Remote Management", "tactic": "Lateral Movement", "sub_technique_id": "", "evidence": "WMI remote process creation from DESKTOP-JD-001 → WORKSTATION-B → WORKSTATION-C with encoded PowerShell payload" },
+      { "technique_id": "T1059.001", "technique_name": "Command and Scripting Interpreter: PowerShell", "tactic": "Execution", "sub_technique_id": "", "evidence": "Base64-encoded PowerShell commands launched via WMI on target workstations" }
+    ],
+    "ioc_list": ["185.220.101.45", "91.108.4.200", "john.doe@contoso.com", "DESKTOP-JD-001", "WORKSTATION-B", "WORKSTATION-C"],
+    "analyst_notes": "No MFA on this account was a critical enabler. Lateral movement payload is Base64-encoded PowerShell  -  de-obfuscation recommended to assess stage 2 intent (likely ransomware staging or exfil beacon). Two unmanaged workstations (WORKSTATION-B/C) are also at risk. Session revocation and device isolation are the immediate priorities."
+  },
+  "response": {
+    "summary": "Credential stuffing from dual Tor/VPN infrastructure (185.220.101.45, 91.108.4.200) successfully compromised john.doe@contoso.com (no MFA). Attacker obtained OAuth tokens and pivoted laterally via WMI to WORKSTATION-B and WORKSTATION-C using encoded PowerShell.",
+    "attack_narrative": "The attacker operated a dual-source credential stuffing campaign  -  847 failed attempts from the Tor exit node 185.220.101.45 and a parallel stream from Russian VPN 91.108.4.200. The account john.doe@contoso.com was protected only by a password (MFA not registered), allowing the attacker to authenticate without challenge. Within 28 seconds of success, a new delegated OAuth permission was added for Microsoft Graph, granting access to mail and files. The attacker then used WMI to execute Base64-encoded PowerShell on WORKSTATION-B, which in turn spread to WORKSTATION-C  -  classic two-hop lateral movement likely establishing a staging foothold. Both workstations are unmanaged (not Intune-enrolled), increasing attacker dwell-time risk.",
+    "severity_assessment": "High",
+    "analyst_notes": "Immediate: revoke sessions + disable account. Isolate DESKTOP-JD-001 and WORKSTATION-B. Decode PowerShell payloads for stage-2 intent. Remediation: enforce MFA for all accounts; enroll WORKSTATION-B/C in Intune; review OAuth consent grant policies.",
+    "recommended_actions": [
+      {
+        "action_id": "act-001",
+        "action": "RevokeUserSessions",
+        "upn": "john.doe@contoso.com",
+        "target": "usr-jd-001",
+        "api_endpoint": "POST https://graph.microsoft.com/v1.0/users/usr-jd-001/revokeSignInSessions",
+        "request_body": {},
+        "note": "Revoke all active sessions  -  OAuth token remains valid until revoked"
+      },
+      {
+        "action_id": "act-002",
+        "action": "DisableAccount",
+        "upn": "john.doe@contoso.com",
+        "target": "usr-jd-001",
+        "api_endpoint": "PATCH https://graph.microsoft.com/v1.0/users/usr-jd-001",
+        "request_body": { "accountEnabled": false },
+        "note": "Disable account until investigation is complete and MFA is enforced"
+      },
+      {
+        "action_id": "act-003",
+        "action": "DeviceIsolation",
+        "machine_id": "dev-jd-001-aaaa",
+        "target": "dev-jd-001-aaaa",
+        "api_endpoint": "POST https://api.security.microsoft.com/api/machines/dev-jd-001-aaaa/isolate",
+        "request_body": { "Comment": "Credential stuffing origin host  -  lateral movement source", "IsolationType": "Full" },
+        "note": "Isolate DESKTOP-JD-001  -  confirmed origin of WMI lateral movement"
+      },
+      {
+        "action_id": "act-004",
+        "action": "DeviceIsolation",
+        "machine_id": "dev-wb-0002-bbbb",
+        "target": "dev-wb-0002-bbbb",
+        "api_endpoint": "POST https://api.security.microsoft.com/api/machines/dev-wb-0002-bbbb/isolate",
+        "request_body": { "Comment": "Lateral movement target  -  encoded PowerShell executed", "IsolationType": "Full" },
+        "note": "Isolate WORKSTATION-B  -  WMI lateral movement target, unmanaged device"
+      }
+    ]
+  },
+  "echo_rule": {
+    "detection_gap_minutes": 47,
+    "earliest_signal": "10:10:03Z  -  First failed login from 185.220.101.45 (Tor exit node)",
+    "rule_name": "TopSec-ECHO: Early Tor Credential Stuffing Detection",
+    "kql_query": "SigninLogs\n| where TimeGenerated > ago(5m)\n| where ResultType != \"0\"\n| where NetworkLocationDetails has \"tor\" or ipv4_is_in_range(IPAddress, \"185.220.0.0/16\")\n| summarize FailCount = count(), Accounts = dcount(UserPrincipalName) by IPAddress, bin(TimeGenerated, 5m)\n| where FailCount > 5\n| project TimeGenerated, IPAddress, FailCount, Accounts\n| extend Severity = iff(FailCount > 50, \"High\", \"Medium\")",
+    "severity": "Medium",
+    "tactics": ["CredentialAccess"],
+    "techniques": ["T1110"],
+    "estimated_gap_reduction_minutes": 44,
+    "pushed_to_sentinel": true,
+    "rule_id": "echo-demo-001"
+  }
+}
