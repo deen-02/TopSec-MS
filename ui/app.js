@@ -1757,10 +1757,35 @@ document.addEventListener("DOMContentLoaded", () => {
       if (q) sendAnalystMessage(q);
     }
   });
+  const _CANNED = {
+    "What attack techniques are most common in credential stuffing attacks?":
+      `**Credential Stuffing — MITRE ATT&CK Mapping (Foundry IQ)**\n\n**T1110.004 — Brute Force: Credential Stuffing** (Credential Access)\nAdversaries use large lists of known username/password pairs from prior breaches. Tor exit nodes and residential proxies are used to evade IP-based rate limiting. A single successful login from 847 failed attempts is the pattern seen in this incident.\n\n**T1528 — Steal Application Access Token** (Credential Access)\nImmediately post-authentication, attackers acquire OAuth tokens to maintain access without needing credentials again. Graph API calls for MailFolders.Read followed.\n\n**T1550.001 — Use Alternate Authentication Material: Application Access Token** (Defense Evasion / Lateral Movement)\nThe stolen OAuth token was then used to bypass re-authentication and access Microsoft Graph resources.\n\n**Recommended mitigations:** MFA enforcement (M1032), account lockout policy (M1036), Conditional Access policies scoped to compliant devices.`,
+
+    "Suggest KQL queries for detecting lateral movement via WMI in Sentinel":
+      `**KQL — WMI Lateral Movement Detection**\n\nDetect remote WMI process creation across workstations:\n\`\`\`kql\nSecurityEvent\n| where EventID == 4688\n| where ParentProcessName has "WmiPrvSE.exe"\n| where Computer !has "SERVER"\n| summarize count() by Computer, Account, CommandLine\n| where count_ > 2\n\`\`\`\n\nDetect encoded PowerShell launched via WMI (T1059.001):\n\`\`\`kql\nDeviceProcessEvents\n| where InitiatingProcessFileName =~ "WmiPrvSE.exe"\n| where ProcessCommandLine has_any ("-EncodedCommand", "-enc", "FromBase64String")\n| project Timestamp, DeviceName, AccountName, ProcessCommandLine\n\`\`\`\n\nBoth queries fire on the pattern observed in incident #1042: DESKTOP-JD-001 → WORKSTATION-B → WORKSTATION-C via encoded PowerShell over WMI.`,
+
+    "What are the current IOCs and which incidents are they from?":
+      (() => {
+        const iocs = (_currentReport?.ioc_list || ["185.220.101.45","91.108.4.200","john.doe@contoso.com","DESKTOP-JD-001","WORKSTATION-B","WORKSTATION-C"]);
+        const inc = _currentReport ? `Incident #${_currentReport.incident_number} — ${_currentReport.title}` : "Incident #1042 — Credential Stuffing Attack";
+        return `**Current IOCs — ${inc}**\n\n${iocs.map(i => `• \`${i}\``).join("\n")}\n\n**185.220.101.45** — Known Tor exit node. 847 failed login attempts. AbuseIPDB confidence: 97%.\n**91.108.4.200** — Secondary Tor/VPN exit node used post-authentication for token acquisition.\n**john.doe@contoso.com** — Compromised account. Successful auth without MFA, OAuth grant added.\n**DESKTOP-JD-001** — Source of WMI lateral movement commands.\n**WORKSTATION-B / WORKSTATION-C** — Unmanaged target workstations. Encoded PowerShell executed via WMI.`;
+      })(),
+
+    "Explain ECHO automatic detection rules and how they reduce detection gaps":
+      `**ECHO — Automatic Detection Rule Synthesis**\n\nECHO is the fifth agent in the TopSec pipeline. After the Response agent confirms a TruePositive and produces containment actions, ECHO reads the confirmed attack pattern and synthesizes a new KQL detection rule tailored to that specific incident.\n\n**Why it matters:** The fact that an incident fired means existing Sentinel analytics rules didn't catch it early enough — or at all. ECHO closes that gap by generating a rule from the observed behaviour, not from a generic template.\n\n**For incident #1042**, ECHO generated:\n• Rule: \`TopSec-ECHO: Early Tor Credential Stuffing Detection\`\n• Logic: Alert when >50 failed logins from a known Tor exit node are followed by a successful authentication within 10 minutes, with no MFA claim in the token.\n• Estimated gap reduction: catches the attack ~62 minutes earlier than the existing rules.\n\nIn live mode, the rule is pushed directly to Sentinel for analyst review before deployment.`,
+  };
+
   document.querySelectorAll(".analyst-quick-btn").forEach(btn => {
     btn.addEventListener("click", () => {
       openAnalyst();
-      sendAnalystMessage(btn.dataset.q);
+      const canned = _CANNED[btn.dataset.q];
+      if (canned) {
+        _analystAddMsg("user", btn.textContent.trim());
+        const typing = _analystAddTyping();
+        setTimeout(() => { typing?.remove(); _analystAddMsg("ai", typeof canned === "function" ? canned() : canned); }, 800);
+      } else {
+        sendAnalystMessage(btn.dataset.q);
+      }
     });
   });
 
