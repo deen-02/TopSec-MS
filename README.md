@@ -1,5 +1,7 @@
 # TopSec Agent
 
+![TopSec Agent](docs/logo.png)
+
 Autonomous Tier-1 SOC analyst. A 5-agent AI pipeline that triages Microsoft Sentinel incidents, maps attacks to MITRE ATT&CK via Azure AI Search (Foundry IQ), and synthesizes new KQL detection rules to close coverage gaps.
 
 Built for the **Microsoft Agents League Hackathon 2026, Reasoning Agents track**.
