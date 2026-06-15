@@ -1732,7 +1732,13 @@ document.addEventListener("DOMContentLoaded", () => {
       item.querySelectorAll(".action-btn").forEach(b => b.classList.toggle("active", b.dataset.approved === "true"));
     });
   });
-  document.getElementById("reject-all-btn").addEventListener("click",  () => submitDecision(false, true));
+  document.getElementById("reject-all-btn").addEventListener("click", () => {
+    document.querySelectorAll(".action-item").forEach(item => {
+      item.dataset.approved = "false";
+      item.className = "action-item rejected";
+      item.querySelectorAll(".action-btn").forEach(b => b.classList.toggle("active", b.dataset.approved === "false"));
+    });
+  });
   document.getElementById("submit-btn").addEventListener("click",      () => submitDecision(false, false));
 
   // Lab triggers
